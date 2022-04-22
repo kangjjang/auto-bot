@@ -1,0 +1,59 @@
+service: auto-bot
+
+frameworkVersion: "^3.3.0"
+
+plugins:
+  - serverless-prune-plugin
+  - serverless-dotenv-plugin
+  - serverless-plugin-typescript
+  - serverless-offline
+custom:
+  stage: ${opt:stage, "prod"}
+  prune:
+    automatic: true
+    number: 20
+  dotenv:
+    path: .env
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: ${self:custom.stage}
+  region: ap-northeast-2
+  deploymentBucket:
+    name: auto-bot-deployment
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - lambda:*
+      Resource: "*"
+
+package:
+  patterns:
+    - 'resources/**'
+    - '!./*yml'
+    - '!.vscode/**'
+    - '!.gitignore'
+    - '!.git/**'
+    - '!tsconfig*'
+    - '!tslint.json'
+    - '!yarn.lock'
+    - '!.serverless/**'
+    - '!Dockerfile*'
+    - '!./docs/**' 
+    - '!./build/**'  
+    - '!./test/**' 
+    - '!./ci/**' 
+    - '!node_modules/serverless*'    
+  excludeDevDependencies: true
+
+functions:
+  # google drive 감지 중지 함수
+  notion-address-convert:
+    name: notion-address-convert
+    handler: src/functions/notion-address-convert/index.handler
+    timeout: 30
+    events:
+      - http:
+          path: notion-address-convert
+          method: post
