@@ -48,7 +48,6 @@ package:
   excludeDevDependencies: true
 
 functions:
-  # google drive 감지 중지 함수
   notion-address-convert:
     name: notion-address-convert
     handler: src/functions/notion-address-convert/index.handler
